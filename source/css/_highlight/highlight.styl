@@ -113,6 +113,10 @@ $code-block
       margin: 2px
 
     i
+      display: inline-flex
+      justify-content: center
+      align-items: center
+      padding: 5px
       cursor: pointer
       transition: all .3s
 
@@ -128,7 +132,7 @@ $code-block
 
     if !$highlight_macstyle
       & > .macStyle
-        padding: 0
+        margin: 0
 
     .code-lang
       flex: 1 1 auto
@@ -182,6 +186,7 @@ if $highlight_macstyle
       .highlight-tools
         .macStyle
           display: flex
+          padding: 3px
 
           & > *
             margin-right: 8px

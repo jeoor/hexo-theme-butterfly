@@ -84,10 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const buttonRect = ele.getBoundingClientRect()
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop
         const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
-        const finalTop = buttonRect.top + scrollTop - 40
         const finalLeft = buttonRect.left + scrollLeft + buttonRect.width / 2
 
-        const topValue = ele.closest('figure.highlight').classList.contains('code-fullpage') ? finalTop + 60 : finalTop
+        // Show tooltip below button if too close to top
+        const normalTop = buttonRect.top + scrollTop - 40
+        const shouldShowBelow = buttonRect.top < 60 || normalTop < 10
+
+        const topValue = shouldShowBelow ? buttonRect.top + scrollTop + buttonRect.height + 10 : normalTop
 
         newEle.style.cssText = `
       top: ${topValue + 10}px;
@@ -111,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800)
       }
     }
+
     const copy = async (text, ctx) => {
       try {
         await navigator.clipboard.writeText(text)
