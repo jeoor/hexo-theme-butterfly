@@ -65,8 +65,40 @@ if hexo-config('waline.bg')
 
 if hexo-config('mermaid.enable')
   .mermaid-wrap
+    position: relative
     margin: 0 0 20px
     text-align: center
+
+    .mermaid-open-btn
+      position: absolute
+      top: 8px
+      right: 8px
+      z-index: 2
+      width: 34px
+      height: 25px
+      padding: 0
+      border: none
+      border-radius: 20%
+      display: flex
+      align-items: center
+      justify-content: center
+      font-size: 0
+      line-height: 1
+      background: #D3D3D3
+      color: #fff
+      cursor: pointer
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15)
+      transition: background 0.2s ease, transform 0.2s ease
+
+      i
+        font-size: 16px
+        line-height: 1
+
+      &:hover,
+      &:focus-visible
+        transform: translateY(-1px)
+        background: #C0C0C0
+        outline: none
 
     & > svg
       height: 100%

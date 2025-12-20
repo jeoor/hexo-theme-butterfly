@@ -31,6 +31,66 @@ script.
 
     const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
 
+    const openSvgInNewTab = ({ source, initViewBox }) => {
+      const getClonedSvg = () => {
+        if (typeof source === 'string') {
+          const template = document.createElement('template')
+          template.innerHTML = source.trim()
+          const svg = template.content.querySelector('svg')
+          return svg ? svg.cloneNode(true) : null
+        }
+        if (source && typeof source.cloneNode === 'function') {
+          return source.cloneNode(true)
+        }
+        return null
+      }
+
+      const clone = getClonedSvg()
+      if (!clone) return
+      if (initViewBox && initViewBox.length === 4) {
+        clone.setAttribute('viewBox', initViewBox.join(' '))
+      }
+      if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+      if (!clone.getAttribute('xmlns:xlink') && clone.outerHTML.includes('xlink:')) {
+        clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+      }
+      const serializer = new XMLSerializer()
+      const svgSource = serializer.serializeToString(clone)
+      const blob = new Blob([svgSource], { type: 'image/svg+xml;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      window.open(url, '_blank', 'noopener')
+      setTimeout(() => URL.revokeObjectURL(url), 30000)
+    }
+
+    const attachMermaidViewerButton = wrap => {
+      const originalSvg = wrap.__mermaidOriginalSvg
+      let btn = wrap.querySelector('.mermaid-open-btn')
+      if (!btn) {
+        btn = document.createElement('button')
+        btn.type = 'button'
+        btn.className = 'mermaid-open-btn'
+        wrap.appendChild(btn)
+      }
+
+      btn.innerHTML = '<i class="fa fa-search fa-fw" aria-hidden="true"></i>'
+
+      if (!btn.__mermaidViewerBound) {
+        btn.addEventListener('click', e => {
+          e.preventDefault()
+          e.stopPropagation()
+          const svg = originalSvg || wrap.querySelector('svg')
+          if (!svg) return
+          const initViewBox = wrap.__mermaidInitViewBox
+          if (typeof svg === 'string') {
+            openSvgInNewTab({ source: svg, initViewBox })
+            return
+          }
+          openSvgInNewTab({ source: svg, initViewBox })
+        })
+        btn.__mermaidViewerBound = true
+      }
+    }
+
     // Zoom around a point (px, py) in the SVG viewport (in viewBox coordinates)
     const zoomAtPoint = (vb, factor, px, py) => {
       const w = vb[2] * factor
@@ -212,6 +272,8 @@ script.
         const renderMermaid = svg => {
           mermaidSrc.insertAdjacentHTML('afterend', svg)
           initMermaidGestures(item)
+          item.__mermaidOriginalSvg = svg
+          attachMermaidViewerButton(item)
         }
 
         // mermaid v9 and v10 compatibility
