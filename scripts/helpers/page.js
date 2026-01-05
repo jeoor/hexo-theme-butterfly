@@ -58,13 +58,9 @@ hexo.extend.helper.register('cloudTags', function (options = {}) {
 
   const userColors = normalizeColors(custom_colors)
 
-  const resolveColor = (idx) => {
-    if (colormode === 'custom' && userColors && userColors.length) {
-      if (userColors.length === 1) return userColors[0]
-      return userColors[idx % userColors.length]
-    }
-    return getRandomColor()
-  }
+  const resolveColorClass = (idx) => `tag-color-${idx % userColors.length}`
+
+  const generateSizeStyle = (size, unit) => `font-size: ${parseFloat(size.toFixed(2))}${unit};`
 
   const generateStyle = (size, unit, page, color) => {
     const colorStyle = page === 'tags' ? `background-color: ${color};` : `color: ${color};`
@@ -74,7 +70,14 @@ hexo.extend.helper.register('cloudTags', function (options = {}) {
   return source.sort(orderby, order).map((tag, idx) => {
     const ratio = length ? sizeMap.get(tag.length) / length : 0
     const size = minfontsize + ((maxfontsize - minfontsize) * ratio)
-    const color = resolveColor(idx)
+
+    if (colormode === 'custom' && userColors && userColors.length) {
+      const colorClass = resolveColorClass(idx)
+      const style = generateSizeStyle(size, unit)
+      return `<a href="${env.url_for(tag.path)}" class="tag-cloud-item ${colorClass}" style="${style}">${tag.name}</a>`
+    }
+
+    const color = getRandomColor()
     const style = generateStyle(size, unit, page, color)
     return `<a href="${env.url_for(tag.path)}" style="${style}">${tag.name}</a>`
   }).join('')
