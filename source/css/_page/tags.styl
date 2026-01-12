@@ -89,16 +89,3 @@
 .page-title
   & + .tag-cloud-list
     text-align: left
-
-tag_colors = hexo-config('aside.card_tags.custom_colors')
-
-.tag-cloud-list .tag-cloud-item
-  background-color var(--tag-cloud-color)
-
-.card-tag-cloud .tag-cloud-item
-  color var(--tag-cloud-color)
-
-if tag_colors && length(tag_colors) > 0
-  for c, i in tag_colors
-    .tag-cloud-item.tag-color-{i}
-      --tag-cloud-color convert(c)

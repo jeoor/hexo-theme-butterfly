@@ -19,7 +19,7 @@ hexo.extend.helper.register('postDesc', data => {
 
 hexo.extend.helper.register('cloudTags', function (options = {}) {
   const env = this
-  let { source, minfontsize, maxfontsize, limit, unit = 'px', orderby, order, page = 'tags', colormode, custom_colors } = options
+  let { source, minfontsize, maxfontsize, limit, unit = 'px', orderby, order, page = 'tags', custom_colors } = options
 
   if (limit > 0) {
     source = source.limit(limit)
@@ -60,8 +60,6 @@ hexo.extend.helper.register('cloudTags', function (options = {}) {
 
   const resolveColorClass = (idx) => `tag-color-${idx % userColors.length}`
 
-  const generateSizeStyle = (size, unit) => `font-size: ${parseFloat(size.toFixed(2))}${unit};`
-
   const generateStyle = (size, unit, page, color) => {
     const colorStyle = page === 'tags' ? `background-color: ${color};` : `color: ${color};`
     return `font-size: ${parseFloat(size.toFixed(2))}${unit}; ${colorStyle}`
@@ -71,9 +69,10 @@ hexo.extend.helper.register('cloudTags', function (options = {}) {
     const ratio = length ? sizeMap.get(tag.length) / length : 0
     const size = minfontsize + ((maxfontsize - minfontsize) * ratio)
 
-    if (colormode === 'custom' && userColors && userColors.length) {
+    if (userColors && userColors.length) {
       const colorClass = resolveColorClass(idx)
-      const style = generateSizeStyle(size, unit)
+      const color = userColors[idx % userColors.length]
+      const style = generateStyle(size, unit, page, color)
       return `<a href="${env.url_for(tag.path)}" class="tag-cloud-item ${colorClass}" style="${style}">${tag.name}</a>`
     }
 
